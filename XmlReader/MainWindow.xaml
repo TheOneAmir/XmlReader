@@ -9,7 +9,8 @@
     <Grid>
         <Button Content="Parse XML" Click="ParseXML" HorizontalAlignment="Left" Margin="663,38,0,0" VerticalAlignment="Top" Width="75"/>
         <TextBox Name="XmlValues" HorizontalAlignment="Left" Height="299" Margin="53,89,0,0" TextWrapping="Wrap" Text="TextBox" VerticalAlignment="Top" Width="685"/>
-        <TextBox Name="XmlKey" HorizontalAlignment="Left" Height="23" Margin="53,38,0,0" TextWrapping="Wrap" Text="TextBox" VerticalAlignment="Top" Width="120"/>
+        <TextBox Name="XmlKey" HorizontalAlignment="Left" Height="20" Margin="53,38,0,0" TextWrapping="Wrap" Text="TextBox" VerticalAlignment="Top" Width="236"/>
+        <Button Content="Parse XmlReader" Click="ParseXMLReader" HorizontalAlignment="Left" Margin="524,38,0,0" VerticalAlignment="Top" Width="119"/>
 
     </Grid>
 </Window>

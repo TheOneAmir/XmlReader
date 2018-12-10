@@ -8,13 +8,8 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
-using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Navigation;
-using System.Windows.Shapes;
+using System.Xml;
+using System.Xml.Linq;
 
 namespace XmlReader
 {
@@ -26,10 +21,51 @@ namespace XmlReader
         //public TextBox XmlKey;
         private string FILE_PATH = "this.xml";
         private static DataSet _dsSet;
+        private static System.Xml.XmlReader reader; 
 
         public MainWindow()
         {
             InitializeComponent();
+        }
+
+        public void ParseXMLReader(object o, EventArgs e)
+        {
+            if (reader == null)
+            {
+                XmlReaderSettings settings = new XmlReaderSettings();
+                settings.IgnoreWhitespace = true;
+            }
+
+            using (reader = System.Xml.XmlReader.Create(FILE_PATH))
+            {
+                var sb = new StringBuilder();
+                while (reader.Read())
+                {
+                    reader.MoveToContent();
+                    if (reader.NodeType == XmlNodeType.Element)
+                    {
+                        if (reader.Name == XmlKey.Text)
+                        {
+                            XElement el = XNode.ReadFrom(reader) as XElement;
+                            if (el != null)
+                            {
+                                foreach (XElement node in el.DescendantNodes().Where(w => w is XElement))
+                                {
+                                    //var v = node.CreateReader();
+                                        sb.Append(((XElement)node).Name);
+                                        sb.Append(": ");
+                                        sb.Append(((XElement)node).Value);
+                                        sb.Append("\n");
+                                }
+                            }
+
+                            break;
+                        }
+                    }
+                }
+
+                XmlValues.Text = sb.ToString();
+            }
         }
 
         public void ParseXML(object o, EventArgs e)
@@ -40,12 +76,39 @@ namespace XmlReader
                 var xmlString = File.ReadAllText(FILE_PATH);
                 var stringReader = new StringReader(xmlString);
                 _dsSet = new DataSet();
-                _dsSet.ReadXml(stringReader);
+                _dsSet.ReadXml(stringReader, XmlReadMode.InferSchema);
             }
 
-            var values = _dsSet.Tables[XmlKey.Text];
-            var toDisplay = XmlKey.Text;
-            XmlValues.Text = Convert.ToString(values);
+            if (XmlKey.Text == "all")
+            {
+                var sb = new StringBuilder();
+                var dataTables = new List<DataTable>();
+                foreach (DataTable table in _dsSet.Tables)
+                {
+                    dataTables.Add(table);
+                    sb.Append(table.TableName);
+                    sb.Append(": ");
+                    sb.Append("\n");
+                }
+
+                XmlValues.Text = sb.ToString();
+            }
+            else
+            {
+                var table = _dsSet.Tables[XmlKey.Text];
+                var sb = new StringBuilder();
+                foreach (DataRow row in table.Rows)
+                {
+                    foreach (var item in row.ItemArray)
+                    {
+                        sb.Append(item);
+                        sb.Append(", ");
+                    }
+                    sb.Append("\n");
+                }
+
+                XmlValues.Text = sb.ToString();
+            }
 
             return;
         }
