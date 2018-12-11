@@ -47,6 +47,28 @@ namespace XmlReader
                         if (reader.Name == XmlKey.Text)
                         {
                             XElement el = XNode.ReadFrom(reader) as XElement;
+                            int rowId;
+                            var isNum = Int32.TryParse(RowNum.Text, out rowId);
+                            var rowNum = rowId.ToString();
+                            if (el.HasAttributes && isNum)
+                            {
+                                var currentAttribute = el.FirstAttribute;
+                                var skipElement = false;
+                                while (currentAttribute != null)
+                                {
+                                    if (currentAttribute.Name == "rownum" && !currentAttribute.Value.Equals(rowNum))
+                                    {
+                                        skipElement = true;
+                                    }
+
+                                    currentAttribute = currentAttribute.NextAttribute;
+                                }
+
+                                if (skipElement)
+                                {
+                                    continue;
+                                }
+                            }
                             if (el != null)
                             {
                                 foreach (XElement node in el.DescendantNodes().Where(w => w is XElement))
